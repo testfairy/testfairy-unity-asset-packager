@@ -1,0 +1,27 @@
+{
+  "name": "testfairy-unity-asset-packager",
+  "version": "1.0.0",
+  "description": "Package a Unity plugin directory into a unitypackage",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "testfairy-unity-asset-packager": "./index.js"
+  },
+  "keywords": [
+    "testfairy",
+    "unity",
+    "plugin"
+  ],
+  "author": "support@testfairy.com",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^3.0.1",
+    "ignore": "^5.1.4",
+    "recursive-readdir": "^2.2.2",
+    "targz": "^1.0.1",
+    "tmp": "^0.1.0",
+    "yaml": "^1.6.0"
+  }
+}
