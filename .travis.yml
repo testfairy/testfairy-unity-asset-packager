@@ -3,7 +3,7 @@ node_js:
 - '12'
 
 before_deploy:
-- sed -i '' "s/\"version\":.*/\"version\":\"${TRAVIS_TAG}\",/g" package.json
+- sed -i "s/\"version\":.*/\"version\":\"${TRAVIS_TAG}\",/g" package.json
 
 deploy:
   provider: npm
