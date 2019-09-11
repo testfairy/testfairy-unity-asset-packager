@@ -1,0 +1,15 @@
+language: node_js
+node_js:
+- '12'
+
+before_deploy:
+- sed -i '' "s/\"version\":.*/\"version\":\"${TRAVIS_TAG}\",/g" package.json
+
+deploy:
+  provider: npm
+  email: support@testfairy.com
+  api_key:
+    secure: c+wii2SXwJ2U517jVHkq5eSxmel2kQfTkXzpyIPFMQZHvhxaIhOZuKq2ezP8Jd5jH9k7uPyXY/PkUOQbmA27+l0kkbiuG2U460LcfHobfNBEInMegv+SXmMLlX2BCDNnF5a9LfJoKhFdEJdj96FTj5snWT8+7RueBTykKOo3v0CLlOKlOTQB6I65HUxtGZ/pDn6QqlfmW0yseiYjWRri5IE1Ky1Fedd6OuSe4B+ccXNcGXpp3uqzjR30Tsk8LaJUsRmPEF1fM7cRoj0Xm9+Jw895GHE43Kh0YLDGrbuftbMrgV68JA4iTqIhKEOBQQrKM/eJOQKFhDfOFKg2UJKWyzuGrTNpNXlgznwuWY5eahGiwEadAR7gAbukwDxMRY6qB3GHdU5yVtoVbQaBKiFqd+8diengVibIKDe3Okx9hIPssD3IoP06szJ5bhDcfWyy2FyJ0z7Kslc+5vlrBljQrgVBPIa+uxjyQrFaRi8x19zYylmsv56WrzF4RyXjjbZvL8d2569ISJ2vgrWxkVrjO3g2wfDeZKKogm4XCdbccwzqvi3XqwWqOnn2Qqi5o7i7722mBQOzqXl0JlepeiiIruKTKVwa0xYHlyS5SbtXdEJqdqU73Ivn+KBNrk0V8bNPfpwCrHZUN+GFb+i3UsjveODJD5+YzaAqA2/z8MRXsHE=
+  on:
+    tags: true
+    repo: testfairy/testfairy-unity-asset-packager
