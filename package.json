@@ -4,7 +4,7 @@
   "description": "Package a Unity plugin directory into a unitypackage",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No test specified\" && exit 0"
   },
   "bin": {
     "testfairy-unity-asset-packager": "./index.js"
