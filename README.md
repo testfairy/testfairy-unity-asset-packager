@@ -74,7 +74,7 @@ If you have an `Asset` directory that looks as follows:
 and you run the following command
 
 ```
-node index.js --exclude 'Scenes*,mainCamera.cs*' --output testfairy.unitypackage "/tmp/"
+testfairy-unity-asset-packager --exclude 'Scenes*,mainCamera.cs*' --output testfairy.unitypackage "/tmp/"
 ```
 
 This will generate a package with the following content:
