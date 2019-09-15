@@ -4,6 +4,8 @@ This is a tool we use to package the TestFairy Unity Plugin.
 
 Unity can import `unitypackage` files as long as they're zipped up in a specific way. This utility is used to package up our Unity plugin. It has one rather large assumption, which is its trying to package a directory which already has a `.meta` file at the same level of files. These `.meta` files are created by Unity.
 
+Want to know moure about Unity packages, checkout this [blog post](https://blog.testfairy.com/packaging-assets-for-unity/)
+
 ## Installation
 
 ```
