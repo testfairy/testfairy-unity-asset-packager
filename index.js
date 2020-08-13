@@ -10,35 +10,47 @@ const tmp = require('tmp');
 const YAML = require('yaml');
 const ignore = require('ignore');
 
+function toUnityPosixPath(pathStr) {
+	let result = pathStr.split(path.sep).join(path.posix.sep);
+
+	debug(`toPosixPath: ${result}`);
+
+	if (result.indexOf("Assets/") !== 0) {
+		result = "Assets/" + result;
+	}
+
+	return result;
+}
+
 let directory = null;
 
 program
- .arguments('<directory>')
- .option('-o, --output <output filename>', 'The output package name', 'Assets.unitypackage')
- .option('--overwrite', 'Overwrite output file if exists', false)
- .option('-x, --exclude <filter>', 'Exclude files/folders using comma separated string (uses .gitignore spec)')
- .option('-p, --prepend <directory>', 'Prepend directory to \'pathname\' in asset package')
- .option('-d, --debug', 'Debug script', false)
- .action(function(dir) {
-	directory = dir || ".";
- })
- .parse(process.argv);
+	.arguments('<directory>')
+	.option('-o, --output <output filename>', 'The output package name', 'Assets.unitypackage')
+	.option('--overwrite', 'Overwrite output file if exists', false)
+	.option('-x, --exclude <filter>', 'Exclude files/folders using comma separated string (uses .gitignore spec)')
+	.option('-p, --prepend <directory>', 'Prepend directory to \'pathname\' in asset package')
+	.option('-d, --debug', 'Debug script', false)
+	.action(function (dir) {
+		directory = dir || ".";
+	})
+	.parse(process.argv);
 
- directory = directory || ".";
+directory = directory || ".";
 
- let ig = ignore();
+let ig = ignore();
 if (program.exclude) {
 	let exclude = program.exclude;
 	ig = ignore().add(exclude.split(',').filter(item => item.trim() !== ''));
 }
 
- let debug = function() {
+let debug = function () {
 	if (program.debug) {
 		console.log(...arguments);
 	}
- }
+}
 
- if (fs.existsSync(program.output)) {
+if (fs.existsSync(program.output)) {
 	if (program.overwrite) {
 		fs.unlinkSync(program.output);
 	} else {
@@ -47,7 +59,7 @@ if (program.exclude) {
 	}
 }
 
-let ignoreFunction = function(file, stats) {
+let ignoreFunction = function (file, stats) {
 	let filePath = path.relative(directory, file);
 	let ignored = ig.ignores(filePath);
 	if (ignored) {
@@ -57,7 +69,7 @@ let ignoreFunction = function(file, stats) {
 	return ignored;
 }
 
- recursive(directory, [ignoreFunction], function (err, files) {
+recursive(directory, [ignoreFunction], function (err, files) {
 	if (err) {
 		console.log("Asset packaging failed", err);
 		process.exit(1);
@@ -68,22 +80,23 @@ let ignoreFunction = function(file, stats) {
 		if (file.endsWith('.meta')) {
 			let original = file.substr(0, file.length - 5);
 			let currentItems = onDiskFiles[original];
-			let items = {...currentItems, meta: file};
+			let items = { ...currentItems, meta: file };
 			onDiskFiles[original] = items;
 		} else {
 			let currentItems = onDiskFiles[file];
-			let items = {...currentItems, asset: file};
+			let items = { ...currentItems, asset: file };
 			onDiskFiles[file] = items;
 		}
 	});
-	
+
 	let temp = tmp.dirSync();
 	let tempDirectory = temp.name;
 	debug(`Working temp directory is ${tempDirectory}.`);
 
 	for (var file in onDiskFiles) {
 		let data = onDiskFiles[file];
-		if (!data.meta) { 
+
+		if (!data.meta) {
 			debug(`Skipping ${file}. Not .meta file found.`);
 			continue;
 		}
@@ -93,29 +106,33 @@ let ignoreFunction = function(file, stats) {
 		let itemDirectory = path.join(tempDirectory, meta.guid);
 		fs.mkdirSync(itemDirectory);
 
+		debug(`\n\n${JSON.stringify(meta)}\n\n`);
+
 		let fullPath = [];
 		if (program.prepend) {
 			fullPath.push(program.prepend);
 		}
 		fullPath.push(path.relative(directory, file));
-		let filePath = path.join(...fullPath);
-		let pathname = path.join(itemDirectory, 'pathname');
+		let filePath = toUnityPosixPath(path.join(...fullPath));
+		let pathname = path.join(itemDirectory, 'pathname').replace();
 		debug(`Writing ${filePath} to ${pathname}`);
 		fs.writeFileSync(pathname, filePath);
 
 		let assetMeta = path.join(itemDirectory, 'asset.meta');
-		debug(`Copying '${data.meta}' to ${assetMeta}`);
+		debug(`Meta Copying '${data.meta}' to ${assetMeta}`);
 		fs.copyFileSync(data.meta, assetMeta);
-		
+
 		if (data.asset) {
 			let asset = path.join(itemDirectory, 'asset');
-			debug(`Copying '${data.asset}' to ${assetMeta}`);
+			debug(`Copying '${data.asset}' to ${asset}`);
 			fs.copyFileSync(data.asset, asset);
+		} else {
+			debug(`No asset to copy for ${file}`);
 		}
 	}
 
-	targz.compress({src: tempDirectory, dest: program.output}, function(err){
-		if(err) {
+	targz.compress({ src: tempDirectory, dest: program.output }, function (err) {
+		if (err) {
 			console.log("Asset packaging failed", err);
 			process.exit(1);
 		} else {
@@ -123,4 +140,3 @@ let ignoreFunction = function(file, stats) {
 		}
 	});
 });
- 
